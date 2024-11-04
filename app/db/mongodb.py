@@ -12,10 +12,9 @@ collection = db["daily_data"]
 def save_daily_data(data):
     # Add a timestamp for when the data is stored
     data["date"] = datetime.utcnow().strftime("%Y-%m-%d")
-    collection.insert_one(data)
+    # Find and replace the data with the same resort name
+    collection.find_one_and_replace(resort_name, data)
 
-def get_daily_data(date=None):
-    if date:
-        return collection.find_one({"date": date})
-    # Default to get the latest record
-    return collection.find().sort("date", -1).limit(1)
+def get_daily_data(resort_name):
+    # Default to get the one with the resort name
+    return collection.find_one(resort_name)

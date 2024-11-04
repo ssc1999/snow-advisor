@@ -6,7 +6,7 @@ from db.mongodb import save_daily_data
 
 def daily_scrape():
     snow_forecast_scraper = SnowForecastScraper()
-    infonieve_scraper = SnowForecastScraper()
+    infonieve_scraper = InfonieveScraper()
     processor = DataProcessor()
     snow_forecast_raw_data = snow_forecast_scraper.scrape_snow_forecast()
     infonieve_raw_data = infonieve_scraper.scrape_infonieve()

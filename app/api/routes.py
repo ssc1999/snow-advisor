@@ -1,9 +1,9 @@
 # app/api/routes.py
 from flask import Blueprint, jsonify
-from db.mongodb import get_daily_data, save_daily_data
-from scraper.snow_forecast import scrape_snow_forecast
-from scraper.infonieve import scrape_infonieve
-from processor.data_processor import process_data
+from ..db.mongodb import get_daily_data, save_daily_data
+from ..scraper.snow_forecast import scrape_snow_forecast
+from ..scraper.infonieve import scrape_infonieve
+from ..processor.data_processor import process_data
 
 bp = Blueprint("api", __name__)
 

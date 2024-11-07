@@ -2,6 +2,7 @@ import json
 from collections import OrderedDict
 import requests
 from bs4 import BeautifulSoup
+from datetime import datetime, timedelta
 
 # Mapping for custom weather descriptions
 WEATHER_PHRASE_MAPPING = {
@@ -20,14 +21,20 @@ def normalize_weather_phrase(phrase):
     """
     return WEATHER_PHRASE_MAPPING.get(phrase.lower(), phrase.title())
 
+def get_forecast_dates():
+    """Generate dates for the 7-day forecast starting from today."""
+    today = datetime.now()
+    return [(today + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(7)]
+
 def scrape_snow_forecast(resort_name):
     # Define URLs for different mountain levels
     levels = ["bot", "mid", "top"]
     base_url = f"https://www.snow-forecast.com/resorts/{resort_name}/6day"
+    forecast_dates = get_forecast_dates()
 
     # Main data structure, using OrderedDict to maintain specific order (AM, PM, Night)
     all_data = {
-        level: {str(day): OrderedDict([("AM", {}), ("PM", {}), ("Night", {})]) for day in range(7)}
+        level: {forecast_dates[day]: OrderedDict([("AM", {}), ("PM", {}), ("Night", {})]) for day in range(7)}
         for level in levels
     }
 
@@ -61,9 +68,9 @@ def scrape_snow_forecast(resort_name):
                     for day in range(7):
                         try:
                             # Each day has 3 time columns (AM, PM, Night in order)
-                            am_data = columns[day * 3].text.strip()  # AM
-                            pm_data = columns[day * 3 + 1].text.strip()  # PM
-                            night_data = columns[day * 3 + 2].text.strip()  # Night
+                            am_data = columns[day * 3].text.strip() or "N/A"  # AM
+                            pm_data = columns[day * 3 + 1].text.strip() or "N/A"  # PM
+                            night_data = columns[day * 3 + 2].text.strip() or "N/A"  # Night
                             
                             # Normalize weather phrases if the key is "weather"
                             if key == "weather":
@@ -72,12 +79,14 @@ def scrape_snow_forecast(resort_name):
                                 night_data = normalize_weather_phrase(night_data)
 
                             # Populate the OrderedDict in the desired order (AM, PM, Night)
-                            all_data[level][str(day)]["AM"][key] = am_data
-                            all_data[level][str(day)]["PM"][key] = pm_data
-                            all_data[level][str(day)]["Night"][key] = night_data
+                            all_data[level][forecast_dates[day]]["AM"][key] = am_data
+                            all_data[level][forecast_dates[day]]["PM"][key] = pm_data
+                            all_data[level][forecast_dates[day]]["Night"][key] = night_data
                         except IndexError:
-                            # Handle cases where data is missing
-                            pass
+                            # Handle cases where data is missing by assigning "N/A"
+                            all_data[level][forecast_dates[day]]["AM"].setdefault(key, "N/A")
+                            all_data[level][forecast_dates[day]]["PM"].setdefault(key, "N/A")
+                            all_data[level][forecast_dates[day]]["Night"].setdefault(key, "N/A")
 
         except requests.RequestException as e:
             print(f"Error fetching data for {level}: {e}")

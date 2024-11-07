@@ -3,6 +3,23 @@ from collections import OrderedDict
 import requests
 from bs4 import BeautifulSoup
 
+# Mapping for custom weather descriptions
+WEATHER_PHRASE_MAPPING = {
+    "rain shwrs": "Rain Showers",
+    "part cloud": "Partly Cloudy",
+    "cloud": "Cloudy",
+    "clear": "Clear",
+    "light rain": "Light Rain",
+    "some clouds": "Some Clouds",
+}
+
+def normalize_weather_phrase(phrase):
+    """
+    Function to normalize or map raw weather phrases to a more readable format.
+    Uses a predefined mapping; defaults to capitalizing words if not in the map.
+    """
+    return WEATHER_PHRASE_MAPPING.get(phrase.lower(), phrase.title())
+
 def scrape_snow_forecast(resort_name):
     # Define URLs for different mountain levels
     levels = ["bot", "mid", "top"]
@@ -42,12 +59,18 @@ def scrape_snow_forecast(resort_name):
                     columns = row.select("td.forecast-table__cell")
                     
                     for day in range(7):
-                        # Each day has 3 time columns (AM, PM, Night in order)
                         try:
+                            # Each day has 3 time columns (AM, PM, Night in order)
                             am_data = columns[day * 3].text.strip()  # AM
                             pm_data = columns[day * 3 + 1].text.strip()  # PM
                             night_data = columns[day * 3 + 2].text.strip()  # Night
                             
+                            # Normalize weather phrases if the key is "weather"
+                            if key == "weather":
+                                am_data = normalize_weather_phrase(am_data)
+                                pm_data = normalize_weather_phrase(pm_data)
+                                night_data = normalize_weather_phrase(night_data)
+
                             # Populate the OrderedDict in the desired order (AM, PM, Night)
                             all_data[level][str(day)]["AM"][key] = am_data
                             all_data[level][str(day)]["PM"][key] = pm_data

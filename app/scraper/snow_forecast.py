@@ -15,16 +15,22 @@ WEATHER_PHRASE_MAPPING = {
 }
 
 def normalize_weather_phrase(phrase):
-    """
-    Function to normalize or map raw weather phrases to a more readable format.
-    Uses a predefined mapping; defaults to capitalizing words if not in the map.
-    """
+    """Function to normalize or map raw weather phrases to a more readable format."""
     return WEATHER_PHRASE_MAPPING.get(phrase.lower(), phrase.title())
 
 def get_forecast_dates():
     """Generate dates for the 7-day forecast starting from today."""
     today = datetime.now()
     return [(today + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(7)]
+
+def sanitize_data(value, key=None):
+    """Replace empty values or '-' with 'N/A'. Also handles snow and precip separately if specified."""
+    if value == "-" or not value:
+        return "N/A"
+    # Specific handling to replace '-' in 'snow' and 'precip' as "N/A" for clarity
+    if key in ["snow", "precip"] and value == "-":
+        return "N/A"
+    return value
 
 def scrape_snow_forecast(resort_name):
     # Define URLs for different mountain levels
@@ -68,9 +74,9 @@ def scrape_snow_forecast(resort_name):
                     for day in range(7):
                         try:
                             # Each day has 3 time columns (AM, PM, Night in order)
-                            am_data = columns[day * 3].text.strip() or "N/A"  # AM
-                            pm_data = columns[day * 3 + 1].text.strip() or "N/A"  # PM
-                            night_data = columns[day * 3 + 2].text.strip() or "N/A"  # Night
+                            am_data = sanitize_data(columns[day * 3].text.strip(), key=key)  # AM
+                            pm_data = sanitize_data(columns[day * 3 + 1].text.strip(), key=key)  # PM
+                            night_data = sanitize_data(columns[day * 3 + 2].text.strip(), key=key)  # Night
                             
                             # Normalize weather phrases if the key is "weather"
                             if key == "weather":

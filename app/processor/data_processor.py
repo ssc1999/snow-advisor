@@ -1,31 +1,36 @@
-# app/processor/data_processor.py
+import json
+from datetime import datetime
 
-def process_data(snow_forecast_data, infonieve_data):
-    if not snow_forecast_data or not infonieve_data:
-        return None
+def process_data(resort_name, snow_forecast_data, infonieve_data):
+    # Check if infonieve_data is a string (JSON) and load it as a dictionary if so
+    if isinstance(infonieve_data, str):
+        try:
+            infonieve_data = json.loads(infonieve_data)
+        except json.JSONDecodeError:
+            raise ValueError("infonieve_data is not a valid JSON string")
 
-    # Assume the latest date is used if dates differ slightly
-    date = snow_forecast_data.get("date") or infonieve_data.get("date")
-    
-    # Merge data from both sources
+    # Check if snow_forecast_data is a string (JSON) and load it as a dictionary if so
+    if isinstance(snow_forecast_data, str):
+        try:
+            snow_forecast_data = json.loads(snow_forecast_data)
+        except json.JSONDecodeError:
+            raise ValueError("snow_forecast_data is not a valid JSON string")
+
+    # Use the current date as the default for 'date' field
+    date = datetime.now().strftime("%Y-%m-%d")
+
+    # Combine infonieve_data with snow_forecast_data, where snow_forecast_data contains forecasted weather by level
     processed_data = {
-        "resort": snow_forecast_data.get("resort"),
+        "resort_name": resort_name,
         "date": date,
-        "weather": {
-            # Example: Averaging temperature, taking max snow depth, etc.
-            "temperature": (
-                (snow_forecast_data.get("temperature") or 0) + (infonieve_data.get("temperature") or 0)
-            ) / 2,
-            "snow_depth": max(snow_forecast_data.get("snow_depth", 0), infonieve_data.get("snow_depth", 0)),
-            "wind_speed": snow_forecast_data.get("wind_speed") or infonieve_data.get("wind_speed")
-        },
-        "advisory": {
-            "snow_depth_threshold": 30,
-            "advisory_status": max(
-                snow_forecast_data.get("snow_depth", 0), infonieve_data.get("snow_depth", 0)
-            ) > 30
-        },
-        "runway_status": snow_forecast_data.get("runway_status") or infonieve_data.get("runway_status")
+        "estado": infonieve_data.get("estado", "N/A"),
+        "calidad": infonieve_data.get("calidad", "N/A"),
+        "espesor_maximo": infonieve_data.get("espesor_maximo", "N/A"),
+        "espesor_minimo": infonieve_data.get("espesor_minimo", "N/A"),
+        "peligro_de_aludes": infonieve_data.get("peligro_de_aludes", "N/A"),
+        "kilometros": infonieve_data.get("kilometros", "N/A"),
+        "pistas": infonieve_data.get("pistas", {}),
+        "weather": snow_forecast_data  # Nest the full snow_forecast_data under 'forecast' key
     }
 
     return processed_data

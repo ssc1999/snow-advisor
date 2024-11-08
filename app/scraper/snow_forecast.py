@@ -15,7 +15,7 @@ WEATHER_PHRASE_MAPPING = {
 }
 
 def normalize_weather_phrase(phrase):
-    """Function to normalize or map raw weather phrases to a more readable format."""
+    """Normalize raw weather phrases to a readable format."""
     return WEATHER_PHRASE_MAPPING.get(phrase.lower(), phrase.title())
 
 def get_forecast_dates():
@@ -23,14 +23,9 @@ def get_forecast_dates():
     today = datetime.now()
     return [(today + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(7)]
 
-def sanitize_data(value, key=None):
-    """Replace empty values or '-' with 'N/A'. Also handles snow and precip separately if specified."""
-    if value == "-" or not value:
-        return "N/A"
-    # Specific handling to replace '-' in 'snow' and 'precip' as "N/A" for clarity
-    if key in ["snow", "precip"] and value == "-":
-        return "N/A"
-    return value
+def sanitize_data(value):
+    """Replace empty values or '-' with 'N/A'."""
+    return "N/A" if value == "-" or not value else value
 
 def scrape_snow_forecast(resort_name):
     # Define URLs for different mountain levels
@@ -38,7 +33,7 @@ def scrape_snow_forecast(resort_name):
     base_url = f"https://www.snow-forecast.com/resorts/{resort_name}/6day"
     forecast_dates = get_forecast_dates()
 
-    # Main data structure, using OrderedDict to maintain specific order (AM, PM, Night)
+    # Main data structure with specific order (AM, PM, Night)
     all_data = {
         level: {forecast_dates[day]: OrderedDict([("AM", {}), ("PM", {}), ("Night", {})]) for day in range(7)}
         for level in levels
@@ -53,17 +48,18 @@ def scrape_snow_forecast(resort_name):
         "snow": "snow",
         "rain": "precip"
     }
-    
+
     for level in levels:
         url = f"{base_url}/{level}"
         try:
             response = requests.get(url)
+            response.raise_for_status()  # Ensure we catch bad responses
             soup = BeautifulSoup(response.text, 'html.parser')
             
             # Parse rows of interest
             rows = soup.select("table.forecast-table__table--content tbody tr")
             
-            # Fill in data for each day and time period
+            # Populate data for each day and time period
             for row in rows:
                 data_row = row.get("data-row")
                 
@@ -74,9 +70,9 @@ def scrape_snow_forecast(resort_name):
                     for day in range(7):
                         try:
                             # Each day has 3 time columns (AM, PM, Night in order)
-                            am_data = sanitize_data(columns[day * 3].text.strip(), key=key)  # AM
-                            pm_data = sanitize_data(columns[day * 3 + 1].text.strip(), key=key)  # PM
-                            night_data = sanitize_data(columns[day * 3 + 2].text.strip(), key=key)  # Night
+                            am_data = sanitize_data(columns[day * 3].text.strip())
+                            pm_data = sanitize_data(columns[day * 3 + 1].text.strip())
+                            night_data = sanitize_data(columns[day * 3 + 2].text.strip())
                             
                             # Normalize weather phrases if the key is "weather"
                             if key == "weather":
@@ -89,10 +85,9 @@ def scrape_snow_forecast(resort_name):
                             all_data[level][forecast_dates[day]]["PM"][key] = pm_data
                             all_data[level][forecast_dates[day]]["Night"][key] = night_data
                         except IndexError:
-                            # Handle cases where data is missing by assigning "N/A"
-                            all_data[level][forecast_dates[day]]["AM"].setdefault(key, "N/A")
-                            all_data[level][forecast_dates[day]]["PM"].setdefault(key, "N/A")
-                            all_data[level][forecast_dates[day]]["Night"].setdefault(key, "N/A")
+                            # Assign "N/A" for missing data
+                            for period in ["AM", "PM", "Night"]:
+                                all_data[level][forecast_dates[day]][period].setdefault(key, "N/A")
 
         except requests.RequestException as e:
             print(f"Error fetching data for {level}: {e}")

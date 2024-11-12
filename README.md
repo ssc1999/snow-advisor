@@ -29,6 +29,8 @@ SNOW-ADVISOR/
 │   ├── api/                # API endpoint definitions
 │   │   ├── advisory/       # Advisory-related routes
 │   │   │   └── routes.py   # Advisory endpoint definitions
+│   │   ├── info/           # Info-related routes
+│   │   │   └── routes.py   # Advisory endpoint definitions
 │   │   ├── resorts/        # Resorts-related routes
 │   │   │   └── routes.py   # Resorts management endpoints
 │   │   ├── weather/        # Weather-related routes
@@ -111,6 +113,7 @@ crontab -e
 ## 📊 Endpoints
 | Endpoint             | Method | Description                                                |
 |----------------------|--------|------------------------------------------------------------|
+| `/info` | GET    | Provides general information about the API.|
 | `/weather/<resort_name>` | GET    | Fetches current snow and weather data for a specified resort. |
 | `/advisory`          | GET    | Checks if the snow depth exceeds a predefined threshold.   |
 | `/resorts/all`       | GET    | Retrieves all resorts listed in the `all_resorts` collection. |

@@ -23,7 +23,6 @@ SNOW-ADVISOR/
 ├── requirements.txt        # List of dependencies for the project
 ├── .env                    # Environment variables for API keys, database URL, etc.
 ├── .gitignore              # Git ignore file for excluding files and directories
-├── config.py               # Configuration file with constants and settings
 ├── run.py                  # Entry point to start the Flask server
 ├── app/                    # Main application folder
 │   ├── __init__.py         # Initializes the app as a Python package

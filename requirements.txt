@@ -1,7 +1,7 @@
-fastapi
-uvicorn
 requests
 beautifulsoup4
-sqlite3
 pydantic
 python-dotenv
+lxml
+openai
+pymongo

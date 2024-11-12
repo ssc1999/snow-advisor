@@ -18,37 +18,40 @@ In winter sports and travel, accurate snow data is crucial. This project address
 Organized for readability and maintainability, each part of the project is separated into a dedicated module:
 
 ```plaintext
-snow_advising_api/
+SNOW-ADVISOR/
 ├── README.md               # Project overview and setup instructions
-├── requirements.txt        # List of dependencies (Flask, BeautifulSoup, etc.)
-├── .env                    # Environment variables for API keys, thresholds, etc.
-├── config.py               # Configuration file (e.g., paths, constants)
-├── main.py                 # Entry point to start the Flask server
-├── scraper/                # Folder for web scraping modules
-│   ├── base_scraper.py     # Base scraper class with shared methods
-│   ├── snow_forecast.py    # Scraper for snow-forecast.com
-│   ├── infonieve.py        # Scraper for infonieve.es
-│   └── aemet.py            # Scraper for aemet.es
-├── processor/              # Folder for data processing and cleaning modules
-│   └── data_processor.py   # Module to clean, transform, and standardize data
-├── db/                     # Database management
+├── requirements.txt        # List of dependencies for the project
+├── .env                    # Environment variables for API keys, database URL, etc.
+├── .gitignore              # Git ignore file for excluding files and directories
+├── config.py               # Configuration file with constants and settings
+├── run.py                  # Entry point to start the Flask server
+├── app/                    # Main application folder
+│   ├── __init__.py         # Initializes the app as a Python package
+│   ├── api/                # API endpoint definitions
+│   │   ├── advisory/       # Advisory-related routes
+│   │   │   └── routes.py   # Advisory endpoint definitions
+│   │   ├── resorts/        # Resorts-related routes
+│   │   │   └── routes.py   # Resorts management endpoints
+│   │   ├── weather/        # Weather-related routes
+│   │   │   ├── routes.py   # Weather endpoint definitions
+│   │   │   └── utils.py    # Utility functions for the weather module
+├── cron/                   # Folder for scheduled scripts
+│   └── daily_scraper.py    # Script to run daily data scraping
+├── db/                     # Database management module
 │   ├── mongodb.py          # MongoDB connection and helper functions
-├── api/                    # API endpoints
-│   ├── advisory/           # Advisory-related routes
-│   │   └── routes.py       # Advisory endpoint definitions
-│   ├── resorts/            # Resorts-related routes
-│   │   └── routes.py       # Resorts management endpoints
-│   ├── weather/            # Weather-related routes
-│   │   └── routes.py       # Weather endpoint definitions
-│   └── __init__.py         # Registering blueprints for the Flask app
-├── cron/                   # Folder for scheduled job scripts
-│   └── daily_scraper.py    # Script to scrape data daily (invoked by Cron)
-├── tests/                  # Unit test files
-│   ├── test_scrapers.py    # Tests for individual scrapers
-│   ├── test_processor.py   # Tests for data processor
-│   └── test_api.py         # Tests for API endpoints
-└── docs/                   # Project documentation (Markdown)
-    └── architecture.md     # Architecture and design documentation
+├── processor/              # Folder for data processing
+│   └── data_processor.py   # Processes and standardizes scraped data
+├── scraper/                # Folder for web scraping modules
+│   ├── base_scraper.py     # Base scraper class with shared functionality
+│   ├── infonieve.py        # Scraper for infonieve.es
+│   └── snow_forecast.py    # Scraper for snow-forecast.com
+├── tasks/                  # Task scripts for setup and initialization
+│   └── initialize_resorts.py # Script to initialize resorts in the database
+└── tests/                  # Unit tests for each component
+    ├── __init__.py         # Initializes the tests folder as a Python package
+    ├── test_api.py         # Tests for API routes
+    ├── test_processor.py   # Tests for data processing logic
+    └── test_scrapers.py    # Tests for individual scrapers
 ```
 
 ## 🛠️ Setup & Installation

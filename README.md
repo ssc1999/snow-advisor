@@ -49,7 +49,6 @@ SNOW-ADVISOR/
 └── tests/                  # Unit tests for each component
     ├── __init__.py         # Initializes the tests folder as a Python package
     ├── test_api.py         # Tests for API routes
-    ├── test_processor.py   # Tests for data processing logic
     └── test_scrapers.py    # Tests for individual scrapers
 ```
 
@@ -124,14 +123,7 @@ crontab -e
 Run all tests to ensure each component works as expected:
 
 ```bash
-pytest tests/
-```
-
-## 🧪 Tests
-Run all tests to ensure each component works as expected:
-
-```bash
-pytest tests/
+pytest
 ```
 
 ## 🔗 Future Improvements

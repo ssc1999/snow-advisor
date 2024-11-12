@@ -1,2 +1,0 @@
-FLASK_APP=run.py
-MONGODB_URI= #set mongodb URI

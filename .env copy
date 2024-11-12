@@ -1,2 +1,6 @@
 FLASK_APP=run.py
 MONGODB_URI= #set mongodb URI
+FLASK_ENV=development
+FLASK_RUN_HOST=
+FLASK_RUN_PORT=
+OPENAI_API_KEY=

@@ -91,6 +91,11 @@ Start the API server locally:
 ```bash
 flask run
 ```
+Start the API server in a server:
+```bash
+nohup flask run
+tail -f nohup.out
+```
 ### 7.Set Up Daily Data Scraping: 
 To automatically update snow and weather data daily, use Cron to schedule the daily_scraper.py script. Edit your crontab file:
 ```bash

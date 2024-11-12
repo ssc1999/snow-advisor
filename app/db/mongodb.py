@@ -84,6 +84,11 @@ def add_resort_to_all_resorts(resort_data):
     )
     return result.upserted_id or result.matched_count  # Return ID if new, count if updated
 
+def delete_resort_from_all_resorts(resort_name):
+    """Delete a resort entry from `all_resorts` collection by resort_name."""
+    result = all_resorts_collection.delete_one({"resort_name": resort_name})
+    return result.deleted_count > 0  # Return True if a document was deleted, False otherwise
+
 def get_daily_data(resort_name):
     """Retrieve today's data for the specified resort from `daily_data` collection."""
     data = collection.find_one({"resort_name": resort_name})

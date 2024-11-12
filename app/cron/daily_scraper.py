@@ -22,5 +22,3 @@ def daily_scrape():
 
 if __name__ == "__main__":
     daily_scrape()
-# TODO add a cron job to run this every day at midnight
-# TODO add logger

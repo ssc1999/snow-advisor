@@ -27,19 +27,15 @@ def sanitize_data(value):
     """Replace empty values or '-' with 'N/A'."""
     return "N/A" if value == "-" or not value else value
 
-def scrape_snow_forecast(resort_name):
-    # Define URLs for different mountain levels
+def scrape_weather(resort_name):
     levels = ["bot", "mid", "top"]
     base_url = f"https://www.snow-forecast.com/resorts/{resort_name}/6day"
     forecast_dates = get_forecast_dates()
 
-    # Main data structure with specific order (AM, PM, Night)
-    all_data = {
-        level: {forecast_dates[day]: OrderedDict([("AM", {}), ("PM", {}), ("Night", {})]) for day in range(7)}
-        for level in levels
-    }
-
-    # Mapping row types to JSON keys
+    # Initialize final data structure
+    all_data = OrderedDict()
+    
+    # Mapping table rows to keys
     row_mapping = {
         "phrases": "weather",
         "wind": "wind",
@@ -50,50 +46,68 @@ def scrape_snow_forecast(resort_name):
     }
 
     for level in levels:
-        url = f"{base_url}/{level}"
+        level_data = OrderedDict()
+        for day in forecast_dates:
+            level_data[day] = {
+                "AM": OrderedDict(),
+                "PM": OrderedDict(),
+                "Night": OrderedDict()
+            }
+
         try:
+            url = f"{base_url}/{level}"
             response = requests.get(url)
-            response.raise_for_status()  # Ensure we catch bad responses
+            response.raise_for_status()
             soup = BeautifulSoup(response.text, 'html.parser')
-            
-            # Parse rows of interest
             rows = soup.select("table.forecast-table__table--content tbody tr")
-            
-            # Populate data for each day and time period
+
             for row in rows:
                 data_row = row.get("data-row")
-                
                 if data_row in row_mapping:
                     key = row_mapping[data_row]
                     columns = row.select("td.forecast-table__cell")
-                    
-                    for day in range(7):
+
+                    for day_idx, day in enumerate(forecast_dates):
                         try:
-                            # Each day has 3 time columns (AM, PM, Night in order)
-                            am_data = sanitize_data(columns[day * 3].text.strip())
-                            pm_data = sanitize_data(columns[day * 3 + 1].text.strip())
-                            night_data = sanitize_data(columns[day * 3 + 2].text.strip())
-                            
-                            # Normalize weather phrases if the key is "weather"
+                            am_data = sanitize_data(columns[day_idx * 3].text.strip())
+                            pm_data = sanitize_data(columns[day_idx * 3 + 1].text.strip())
+                            night_data = sanitize_data(columns[day_idx * 3 + 2].text.strip())
+
                             if key == "weather":
                                 am_data = normalize_weather_phrase(am_data)
                                 pm_data = normalize_weather_phrase(pm_data)
                                 night_data = normalize_weather_phrase(night_data)
 
-                            # Populate the OrderedDict in the desired order (AM, PM, Night)
-                            all_data[level][forecast_dates[day]]["AM"][key] = am_data
-                            all_data[level][forecast_dates[day]]["PM"][key] = pm_data
-                            all_data[level][forecast_dates[day]]["Night"][key] = night_data
+                            # Populate data directly in the correct structure
+                            level_data[day]["AM"][key] = am_data
+                            level_data[day]["PM"][key] = pm_data
+                            level_data[day]["Night"][key] = night_data
                         except IndexError:
                             # Assign "N/A" for missing data
                             for period in ["AM", "PM", "Night"]:
-                                all_data[level][forecast_dates[day]][period].setdefault(key, "N/A")
+                                level_data[day][period].setdefault(key, "N/A")
 
         except requests.RequestException as e:
             print(f"Error fetching data for {level}: {e}")
-            all_data[level] = None  # Mark level as unavailable if fetch fails
+            all_data[level] = None
+            continue
 
-    # Convert the final output to a JSON string with enforced ordering
-    json_data = json.dumps(all_data, ensure_ascii=False, indent=4)
-    
-    return json_data
+        # Finalize level data in `all_data`
+        all_data[level] = level_data
+
+    # Convert to JSON with strict order
+    return json.dumps(all_data, ensure_ascii=False, indent=4)
+
+def scrape_resorts_names():
+    url = "https://www.snow-forecast.com/sitemap.xml"
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'xml')
+    resorts = set()
+
+    for loc in soup.find_all("loc"):
+        url = loc.text
+        if "/resorts/" in url and url.count("/") == 5:
+            resort_name = url.split("/")[4]
+            resorts.add(resort_name)
+
+    return list(resorts)

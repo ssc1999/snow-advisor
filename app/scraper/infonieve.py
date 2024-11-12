@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-def scrape_infonieve(resort_name):
+def scrape_resort_data(resort_name):
     # Base URL for the resort's snow report page
     url = f"https://infonieve.es/estacion-esqui/{resort_name}/parte-de-nieve/"
 
@@ -88,3 +88,27 @@ def scrape_infonieve(resort_name):
         print(f"Error scraping from Infonieve for {resort_name}: {e}")
     
     return resort_data
+
+def scrape_resorts_names():
+    url = "https://infonieve.es/sitemap.xml"
+    response = requests.get(url)
+
+    # Check if the request was successful
+    if response.status_code != 200:
+        return []
+
+    # Split the content by lines
+    lines = response.text.splitlines()
+    resorts = set()
+
+    # Iterate through each line to find resort URLs
+    for line in lines:
+        line = line.strip()  # Remove extra whitespace
+
+        # Match URLs in the format /estacion-esqui/<resort_name>/
+        if "/estacion-esqui/" in line and line.count("/") == 5:
+            resort_name = line.split("/")[4]
+            resorts.add(resort_name)
+
+    # Return resort names as a list
+    return list(resorts)

@@ -13,7 +13,7 @@ def fetch_resorts():
     resorts = get_resorts_cache()
     return jsonify(resorts), 200
 
-@bp.route("/add", methods=["POST"])
+@bp.route("", methods=["POST"])
 def add_resort():
     resort_data = request.get_json()
     if not resort_data or "resort_name" not in resort_data:
@@ -25,7 +25,7 @@ def add_resort():
     else:
         return jsonify({"message": "No change made."}), 200
     
-@bp.route("/delete", methods=["DELETE"])
+@bp.route("", methods=["DELETE"])
 def delete_resort():
     resort_data = request.get_json()
     if not resort_data or "resort_name" not in resort_data:

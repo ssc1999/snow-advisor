@@ -110,7 +110,8 @@ crontab -e
 | `/advisory`          | GET    | Checks if the snow depth exceeds a predefined threshold.   |
 | `/resorts/all`       | GET    | Retrieves all resorts listed in the `all_resorts` collection. |
 | `/resorts/cache`     | GET    | Retrieves cached resorts data from the `resorts` collection. |
-| `/resorts/add`       | POST   | Adds or updates a resort in the `all_resorts` collection.  |
+| `/resorts`       | POST   | Adds or updates a resort in the `all_resorts` collection.  |
+| `/resorts`       | DELETE   | Delete a resort in the `all_resorts` collection.  |
 
 ## 🛠️ Technology Stack
 - Python: Core programming language for backend development.
@@ -127,9 +128,9 @@ pytest
 ```
 
 ## 🔗 Future Improvements
-Enhanced Caching: Further reduce load on sources by implementing a more advanced caching strategy.
-Error Resilience: Expand error handling for better resilience to data source downtime.
-Historical Data Analysis: Provide insights on past snow data and trends.
+- Enhanced Caching: Further reduce load on sources by implementing a more advanced caching strategy.
+- Error Resilience: Expand error handling for better resilience to data source downtime.
+- Historical Data Analysis: Provide insights on past snow data and trends.
 
 ## 📜 License
 This project is licensed under the MIT License. Feel free to use and modify it as needed.

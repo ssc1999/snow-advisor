@@ -58,12 +58,11 @@ def scrape_resort_data(resort_name):
             if (peligro_div.text.strip() != "sin información"):
                 resort_data["peligro_de_aludes"] = peligro_div.text.strip()
 
-        # Scrape 'Kilometros' (total kilometers)
-        kilometros_div = soup.select_one(".box_est_partedet_datosgeneral .dato_circulo")
-        if kilometros_div:
-            kilometros_data = kilometros_div.select_one(".dato_circulo_dato").text.strip()
-            kilometros_data_totals = kilometros_div.select_one(".dato_circulo_leyenda").text.strip()
-            resort_data["kilometros"] = f"{kilometros_data}{kilometros_data_totals}"  # Format as "kilometros_data /kilometros_data_totals"
+        # Scrape 'Kilómetros' total kilometers
+        kilometros_span = soup.select_one(".box_est_parte_datos span:nth-child(2)")
+        if kilometros_span:
+            kilometros_data_totals = kilometros_span.select_one("em").text.strip()  # Extracts '50,5' from the <em> tag
+            resort_data["kilometros"] = kilometros_data_totals
 
         # Scrape 'Pistas Totales' (total pistes count)
         pistas_div = soup.select(".box_est_partedet_datosgeneral .dato_circulo")[1]

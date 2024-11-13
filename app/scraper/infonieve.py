@@ -62,7 +62,7 @@ def scrape_resort_data(resort_name):
         kilometros_div = soup.select_one(".box_est_ficha_bloque1 .tr:nth-child(2) .box_est_ficha_td2")
         if kilometros_div:
             kilometros_data = kilometros_div.get_text(strip=True).replace("km", "")
-            resort_data["kilometros_total"] = kilometros_data  # Stores the value '80' without the 'km' text
+            resort_data["kilometros"] = kilometros_data  # Stores the value '80' without the 'km' text
 
         # Scrape 'Pistas Totales' (total pistes count)
         pistas_div = soup.select(".box_est_partedet_datosgeneral .dato_circulo")[1]

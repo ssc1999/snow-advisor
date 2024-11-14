@@ -16,12 +16,6 @@ resorts_collection.create_index([("resort_name", ASCENDING)], unique=True)
 all_resorts_collection.create_index([("resort_name", ASCENDING)], unique=True)
 
 def save_daily_data(resort_name, data):
-    """Save daily weather data to `daily_data` collection."""
-    required_keys = ["date", "weather", "estado"]
-    if not all(key in data for key in required_keys):
-        print(f"Data for {resort_name} is incomplete, not saving.")
-        return False
-
     # Ensure no existing "date" field conflict on update
     data.pop("date", None)
     data["date"] = datetime.utcnow().strftime("%Y-%m-%d")

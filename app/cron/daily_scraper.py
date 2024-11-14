@@ -18,7 +18,7 @@ def daily_scrape():
         if processed_data:
         # Attempt to save; only proceed if save is successful
             if not save_daily_data(resort_name, processed_data):
-                return jsonify({"error": f"Data not found or could not scrape data for {resort_name}"}), 404
+                print(f"Data not found or could not scrape data for {resort_name}")
 
 if __name__ == "__main__":
     daily_scrape()

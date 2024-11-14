@@ -16,7 +16,8 @@ def get_weather(resort_name):
     standardized_name = all_resort_entry["resort_name"]
     daily_data = get_daily_data(standardized_name)
     today_date = datetime.utcnow().strftime("%Y-%m-%d")
-    if daily_data and daily_data.get("date") == today_date:
+    
+    if daily_data:
         return jsonify(daily_data)
 
     snow_forecast_data = snow_forecast_scrape_weather(all_resort_entry["snow_forecast_name"])

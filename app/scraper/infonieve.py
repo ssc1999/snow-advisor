@@ -58,7 +58,7 @@ def scrape_resort_data(resort_name):
             if (peligro_div.text.strip() != "sin información"):
                 resort_data["peligro_de_aludes"] = peligro_div.text.strip()
 
-        # Scrape 'Kilómetros' value under the PISTAS Y REMONTES section
+        # Scrape 'Kilómetros'
         kilometros_div = soup.select_one(".box_est_partedet_datosgeneral > div:nth-of-type(3) .dato_circulo_leyenda")
         if kilometros_div:
             kilometros_data = kilometros_div.text.strip().replace("/", "")

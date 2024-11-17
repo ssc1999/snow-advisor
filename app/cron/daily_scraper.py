@@ -24,12 +24,7 @@ def daily_scrape():
         
         if processed_data:
         # Attempt to save; only proceed if save is successful
-            if save_daily_data(resort_name, processed_data):
-                print(f"Data saved for {resort_name}")
-                date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                if not save_resort_cache({"resort_name": resort_name, "last_updated": date}):
-                    print(f"Resort cache not updated for {resort_name}")
-            else:
+            if not save_daily_data(resort_name, processed_data):
                 print(f"Data not found or could not scrape data for {resort_name}")
 
 if __name__ == "__main__":

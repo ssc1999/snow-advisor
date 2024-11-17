@@ -15,7 +15,6 @@ def get_weather(resort_name):
 
     standardized_name = all_resort_entry["resort_name"]
     daily_data = get_daily_data(standardized_name)
-    today_date = datetime.utcnow().strftime("%Y-%m-%d")
     
     if daily_data:
         return jsonify(daily_data)
@@ -25,9 +24,6 @@ def get_weather(resort_name):
     processed_data = process_data(standardized_name, snow_forecast_data, infonieve_data)
 
     if processed_data:
-        processed_data["last_updated"] = today_date
-        save_resort_cache({"resort_name": standardized_name, "last_updated": today_date})
-        processed_data["date"] = today_date
         save_daily_data(standardized_name, processed_data)
         return jsonify(processed_data)
 

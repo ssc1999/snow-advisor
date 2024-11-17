@@ -18,7 +18,8 @@ all_resorts_collection.create_index([("resort_name", ASCENDING)], unique=True)
 def save_daily_data(resort_name, data):
     # Ensure no existing "date" field conflict on update
     data.pop("date", None)
-    data["date"] = datetime.utcnow().strftime("%Y-%m-%d")
+    data["date"] = datetime.now().strftime("%Y-%m-%d")
+    last_updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # Upsert data by `resort_name`
     collection.find_one_and_replace(
@@ -26,6 +27,9 @@ def save_daily_data(resort_name, data):
         data,
         upsert=True
     )
+    # Update resort cache
+    self.save_resort_cache({"resort_name": resort_name, "last_updated": last_updated})
+    
     return True
 
 def get_resorts_cache():

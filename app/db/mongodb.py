@@ -45,9 +45,9 @@ def get_all_resorts():
 def save_resort_cache(resort_data):
     """Save or update a resort in `resorts` cache with last_updated info."""
     resorts_collection.update_one(
-        {"resort_name": resort_data["resort_name"]},
-        {"$setOnInsert": {"resort_name": resort_data["resort_name"], "last_updated": resort_data["last_updated"]}},
-        upsert=True
+        {"resort_name": resort_data["resort_name"]},  # Filter by resort_name
+        {"$set": {"resort_name": resort_data["resort_name"], "last_updated": resort_data["last_updated"]}},  # Always update last_updated
+        upsert=True  # Insert a new document if none exists
     )
 
 def check_resort_in_resort_cache(resort_name):

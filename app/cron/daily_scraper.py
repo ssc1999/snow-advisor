@@ -2,7 +2,8 @@
 from scraper.snow_forecast import SnowForecastScraper
 from scraper.infonieve import InfonieveScraper
 from processor.data_processor import DataProcessor
-from db.mongodb import save_daily_data, get_resorts_cache, check_resort_in_all_resorts
+from datetime import datetime
+from db.mongodb import save_daily_data, get_resorts_cache, check_resort_in_all_resorts, save_resort_cache
 
 def daily_scrape():
     resorts = get_resorts_cache()
@@ -23,7 +24,13 @@ def daily_scrape():
         
         if processed_data:
         # Attempt to save; only proceed if save is successful
-            if not save_daily_data(resort_name, processed_data):
+            if save_daily_data(resort_name, processed_data):
+                print(f"Data saved for {resort_name}")
+                date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                
+                if not save_resort_cache({"resort_name": resort_name, "last_updated": today_date}):
+                    print(f"Resort cache not updated for {resort_name}")
+            else:
                 print(f"Data not found or could not scrape data for {resort_name}")
 
 if __name__ == "__main__":

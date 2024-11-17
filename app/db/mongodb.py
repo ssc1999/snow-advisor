@@ -28,7 +28,7 @@ def save_daily_data(resort_name, data):
         upsert=True
     )
     # Update resort cache
-    self.save_resort_cache({"resort_name": resort_name, "last_updated": last_updated})
+    save_resort_cache({"resort_name": resort_name, "last_updated": last_updated})
     
     return True
 

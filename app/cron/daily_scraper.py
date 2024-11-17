@@ -8,12 +8,14 @@ def daily_scrape():
     resorts = get_resorts_cache()
     for resort in resorts:
         resort_name = resort["resort_name"]
-        snow_forecast_scraper = SnowForecastScraper(resort_name)
-        infonieve_scraper = InfonieveScraper(resort_name)
+        infonieve_name = resort["infonieve_name"]
+        snow_forecast_name = resort["snow_forecast_name"]
+        infonieve_scraper = InfonieveScraper(infonieve_name)
+        snow_forecast_scraper = SnowForecastScraper(snow_forecast_name)
         processor = DataProcessor()
-        snow_forecast_raw_data = snow_forecast_scraper.scrape_weather()
         infonieve_raw_data = infonieve_scraper.scrape_resort_data()
-        processed_data = processor.process_data(resort_name, snow_forecast_raw_data, infonieve_raw_data)
+        snow_forecast_raw_data = snow_forecast_scraper.scrape_weather()
+        processed_data = processor.process_data(self,resort_name, snow_forecast_raw_data, infonieve_raw_data)
         
         if processed_data:
         # Attempt to save; only proceed if save is successful

@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 
 class DataProcessor:
-    def process_data(resort_name, snow_forecast_data, infonieve_data):
+    def process_data(self, resort_name, snow_forecast_data, infonieve_data):
         # Check if infonieve_data is a string (JSON) and load it as a dictionary if so
         if isinstance(infonieve_data, str):
             try:

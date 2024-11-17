@@ -19,7 +19,7 @@ def daily_scrape():
         
         infonieve_raw_data = infonieve_scraper.scrape_resort_data()
         snow_forecast_raw_data = snow_forecast_scraper.scrape_weather()
-        processed_data = processor.process_data(self,resort_name, snow_forecast_raw_data, infonieve_raw_data)
+        processed_data = processor.process_data(resort_name, snow_forecast_raw_data, infonieve_raw_data)
         
         if processed_data:
         # Attempt to save; only proceed if save is successful

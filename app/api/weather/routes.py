@@ -23,8 +23,9 @@ def get_weather(resort_name):
     snow_forecast_scraper = SnowForecastScraper(all_resort_entry["snow_forecast_name"])
     snow_forecast_data = snow_forecast_scraper.scrape_weather()
 
-    infonieve_data = InfonieveScraper(all_resort_entry["infonieve_name"])
-    processed_data = DataProcessor(standardized_name, snow_forecast_data, infonieve_data)
+    infonieve_scraper = InfonieveScraper(all_resort_entry["infonieve_name"])
+    infonieve_data = infonieve_scraper.scrape_resort_data()
+    processed_data = DataProcessor().process_data(standardized_name, snow_forecast_data, infonieve_data)
 
     if processed_data:
         save_daily_data(standardized_name, processed_data)

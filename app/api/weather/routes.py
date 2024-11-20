@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify
-from ...db.mongodb import get_daily_data, save_daily_data, save_resort_cache, check_resort_in_all_resorts
-from ...scraper.snow_forecast import scrape_weather as snow_forecast_scrape_weather
-from ...scraper.infonieve import scrape_resort_data as infonieve_scrape_resort_data
-from ...processor.data_processor import process_data
+from ...db.mongodb import get_daily_data, save_daily_data, check_resort_in_all_resorts
+from ...scraper.snow_forecast import SnowForecastScraper
+from ...scraper.infonieve import InfonieveScraper
+from ...processor.data_processor import DataProcessor
 from datetime import datetime
 
 bp = Blueprint("weather", __name__)
@@ -15,13 +15,16 @@ def get_weather(resort_name):
 
     standardized_name = all_resort_entry["resort_name"]
     daily_data = get_daily_data(standardized_name)
-    
+
     if daily_data:
         return jsonify(daily_data)
 
-    snow_forecast_data = snow_forecast_scrape_weather(all_resort_entry["snow_forecast_name"])
-    infonieve_data = infonieve_scrape_resort_data(all_resort_entry["infonieve_name"])
-    processed_data = process_data(standardized_name, snow_forecast_data, infonieve_data)
+    # Initialize scrapers
+    snow_forecast_scraper = SnowForecastScraper(all_resort_entry["snow_forecast_name"])
+    snow_forecast_data = snow_forecast_scraper.scrape_weather()
+
+    infonieve_data = InfonieveScraper(all_resort_entry["infonieve_name"])
+    processed_data = DataProcessor(standardized_name, snow_forecast_data, infonieve_data)
 
     if processed_data:
         save_daily_data(standardized_name, processed_data)

@@ -59,16 +59,18 @@ class InfonieveScraper:
 
             for i, type_ in enumerate(trail_types):
                 try:
-                    # Extract data safely and strip whitespace
+                    # Safely extract the data for count and total
                     count = trail_breakdown_divs[i].select_one(".dato_circulo_dato")
                     total = trail_breakdown_divs[i].select_one(".dato_circulo_leyenda")
+
+                    # Assign sanitized data or fallback to "-"
+                    count_text = count.text.strip() if count and count.text.strip() else "-"
+                    total_text = total.text.strip() if total and total.text.strip() else "-"
                     
-                    # Sanitize and assign data, ensuring no extra slashes
-                    count_text = count.text.strip() if count else "-"
-                    total_text = total.text.strip() if total else "-"
+                    # Format the string correctly
                     resort_data["pistas"][type_] = f"{count_text}/{total_text}"
                 except (IndexError, AttributeError):
-                    # Assign default value if data is missing
+                    # Default value for missing data
                     resort_data["pistas"][type_] = "-"
 
         except requests.RequestException as e:

@@ -9,19 +9,19 @@ class InfonieveScraper:
     def scrape_resort_data(self):
         """Scrape the snow report data for a specific resort from Infonieve."""
         resort_data = {
-            "estado": 0,
-            "calidad": "N/A",
-            "espesor_maximo": "N/A",
-            "espesor_minimo": "N/A",
-            "peligro_de_aludes": "N/A",
-            "kilometros": "N/A",
+            "estado": "Closed",
+            "calidad": "-",
+            "espesor_maximo": "-",
+            "espesor_minimo": "-",
+            "peligro_de_aludes": "-",
+            "kilometros": "-",
             "pistas": {
-                "totales": "N/A",
-                "verdes": "N/A",
-                "azules": "N/A",
-                "rojas": "N/A",
-                "negras": "N/A",
-                "itinerarios": "N/A"
+                "totales": "-",
+                "verdes": "-",
+                "azules": "-",
+                "rojas": "-",
+                "negras": "-",
+                "itinerarios": "-"
             }
         }
 
@@ -32,7 +32,7 @@ class InfonieveScraper:
             # 'Estado' (open/closed status)
             estado_div = soup.select_one(".box_est_parteestado_estado")
             if estado_div and estado_div.text.strip() != "CERRADA":
-                resort_data["estado"] = 1
+                resort_data["estado"] = "Closed"
 
             # 'Calidad' (snow quality)
             calidad_div = soup.select_one(".box_est_partedet_nieve")
@@ -42,8 +42,8 @@ class InfonieveScraper:
             # 'Espesor Mínimo' and 'Espesor Máximo' (snow depths)
             espesor_divs = soup.select(".box_est_partedet_datosnieve .box_est_partedet_dato")
             if len(espesor_divs) >= 2:
-                resort_data["espesor_minimo"] = espesor_divs[0].text.strip().replace("cm", "") or "N/A"
-                resort_data["espesor_maximo"] = espesor_divs[1].text.strip().replace("cm", "") or "N/A"
+                resort_data["espesor_minimo"] = espesor_divs[0].text.strip().replace("cm", "") or "-"
+                resort_data["espesor_maximo"] = espesor_divs[1].text.strip().replace("cm", "") or "-"
 
             # 'Peligro de Aludes' (avalanche danger level)
             peligro_div = soup.select_one(".box_est_partedet_aludes .box_est_partedet_aludesno")
@@ -69,7 +69,7 @@ class InfonieveScraper:
                     total = trail_breakdown_divs[i].select_one(".dato_circulo_leyenda").text.strip()
                     resort_data["pistas"][type_] = f"{count}{total}"
                 except (IndexError, AttributeError):
-                    resort_data["pistas"][type_] = "N/A"  # Handle missing data
+                    resort_data["pistas"][type_] = "-"  # Handle missing data
 
         except requests.RequestException as e:
             print(f"Error scraping from Infonieve for {self.resort_name}: {e}")

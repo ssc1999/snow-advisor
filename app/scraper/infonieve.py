@@ -56,10 +56,19 @@ class InfonieveScraper:
 
             trail_breakdown_divs = soup.select(".box_est_partedet_datospistas .dato_circulo")
             trail_types = ["verdes", "azules", "rojas", "negras", "itinerarios"]
+
             for i, type_ in enumerate(trail_types):
                 try:
-                    resort_data["pistas"][type_] = f"{trail_breakdown_divs[i].select_one('.dato_circulo_dato').text.strip()} / {trail_breakdown_divs[i].select_one('.dato_circulo_leyenda').text.strip()}"
+                    # Extract data safely and strip whitespace
+                    count = trail_breakdown_divs[i].select_one(".dato_circulo_dato")
+                    total = trail_breakdown_divs[i].select_one(".dato_circulo_leyenda")
+                    
+                    # Sanitize and assign data, ensuring no extra slashes
+                    count_text = count.text.strip() if count else "-"
+                    total_text = total.text.strip() if total else "-"
+                    resort_data["pistas"][type_] = f"{count_text}/{total_text}"
                 except (IndexError, AttributeError):
+                    # Assign default value if data is missing
                     resort_data["pistas"][type_] = "-"
 
         except requests.RequestException as e:

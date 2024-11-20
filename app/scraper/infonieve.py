@@ -46,33 +46,44 @@ class InfonieveScraper:
             if peligro_div and peligro_div.text.strip() != "sin información":
                 resort_data["peligro_de_aludes"] = peligro_div.text.strip()
 
-            kilometros_div = soup.select_one(".box_est_partedet_datosgeneral > div:nth-of-type(3) .dato_circulo_leyenda")
+            kilometros_div = soup.select_one(".box_est_partedet_datosgeneral > div:nth-of-type(3) .dato_circulo")
             if kilometros_div:
-                resort_data["kilometros"] = kilometros_div.text.strip().replace("/", "")
-
+                dato = kilometros_div.select_one(".dato_circulo_dato")
+                leyenda = kilometros_div.select_one(".dato_circulo_leyenda")
+                
+                dato_text = dato.text.strip() if dato and dato.text.strip() else "-"
+                leyenda_text = leyenda.text.strip().lstrip("/") if leyenda and leyenda.text.strip() else "-"
+                
+                # Combine both parts into the desired format
+                resort_data["kilometros"] = f"{dato_text}/{leyenda_text}"
+    
             pistas_div = soup.select(".box_est_partedet_datosgeneral .dato_circulo")
             if len(pistas_div) > 1:
-                resort_data["pistas"]["totales"] = f"{pistas_div[1].select_one('.dato_circulo_dato').text.strip()} / {pistas_div[1].select_one('.dato_circulo_leyenda').text.strip()}"
+                # Safely extract text from dato_circulo_dato and dato_circulo_leyenda
+                dato = pistas_div[1].select_one(".dato_circulo_dato")
+                leyenda = pistas_div[1].select_one(".dato_circulo_leyenda")
+                
+                dato_text = dato.text.strip() if dato and dato.text.strip() else "-"
+                leyenda_text = leyenda.text.strip().lstrip("/") if leyenda and leyenda.text.strip() else "-"
+                
+                # Combine into the desired format
+                resort_data["pistas"]["totales"] = f"{dato_text}/{leyenda_text}"
 
+            # Extract individual piste types (verdes, azules, etc.)
             trail_breakdown_divs = soup.select(".box_est_partedet_datospistas .dato_circulo")
             trail_types = ["verdes", "azules", "rojas", "negras", "itinerarios"]
-
             for i, type_ in enumerate(trail_types):
                 try:
-                    # Safely extract the data for count and total
                     count = trail_breakdown_divs[i].select_one(".dato_circulo_dato")
                     total = trail_breakdown_divs[i].select_one(".dato_circulo_leyenda")
-
-                    # Assign sanitized data or fallback to "-"
-                    count_text = count.text.strip() if count and count.text.strip() else "-"
-                    total_text = total.text.strip() if total and total.text.strip() else "-"
                     
-                    # Format the string correctly
+                    count_text = count.text.strip() if count and count.text.strip() else "-"
+                    total_text = total.text.strip().lstrip("/") if total and total.text.strip() else "-"
+                    
                     resort_data["pistas"][type_] = f"{count_text}/{total_text}"
                 except (IndexError, AttributeError):
-                    # Default value for missing data
                     resort_data["pistas"][type_] = "-"
-
+                    
         except requests.RequestException as e:
             print(f"Error fetching data for {self.resort_name}: {e}")
 

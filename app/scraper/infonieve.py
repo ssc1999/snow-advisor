@@ -71,7 +71,17 @@ class InfonieveScraper:
 
             # Extract individual piste types (verdes, azules, etc.)
             trail_breakdown_divs = soup.select(".box_est_partedet_datospistas .dato_circulo")
-            trail_types = ["green", "blue", "red", "black", "itineraries"]
+            trail_types = ["verdes", "azules", "rojas", "negras", "itinerarios"]
+            
+            # Mapping of Spanish trail types to English
+            trail_type_translation = {
+                "verdes": "green",
+                "azules": "blue",
+                "rojas": "red",
+                "negras": "black",
+                "itinerarios": "itineraries"
+            }
+
             for i, type_ in enumerate(trail_types):
                 try:
                     count = trail_breakdown_divs[i].select_one(".dato_circulo_dato")
@@ -80,9 +90,9 @@ class InfonieveScraper:
                     count_text = count.text.strip() if count and count.text.strip() else "-"
                     total_text = total.text.strip().lstrip("/") if total and total.text.strip() else "-"
                     
-                    resort_data["pistas"][type_] = f"{count_text}/{total_text}"
+                    resort_data["pistas"][trail_type_translation[type_]] = f"{count_text}/{total_text}"
                 except (IndexError, AttributeError):
-                    resort_data["pistas"][type_] = "-"
+                    resort_data["pistas"][trail_type_translation[type_]] = "-"
                     
         except requests.RequestException as e:
             print(f"Error fetching data for {self.resort_name}: {e}")

@@ -25,6 +25,7 @@ class InfonieveScraper:
             }
         }
 
+
         try:
             response = requests.get(self.base_url, timeout=10)
             response.raise_for_status()
@@ -34,17 +35,41 @@ class InfonieveScraper:
             estado_div = soup.select_one(".box_est_parteestado_estado")
             resort_data["status"] = "Open" if estado_div and estado_div.text.strip() != "CERRADA" else "Closed"
 
+            # Updated mapping dictionary
+            quality_translation = {
+                "Húmeda": "Wet",
+                "Dura": "Hard",
+                "Polvo": "Powder",
+                "Fresca": "Fresh",
+                "-": "-"  # Default for missing data
+            }
+
+            # Select and process the quality data
             calidad_div = soup.select_one(".box_est_partedet_nieve")
-            resort_data["quality"] = calidad_div.text.strip() if calidad_div else "-"
+            raw_quality = calidad_div.text.strip() if calidad_div else "-"
+
+            if "/" in raw_quality:
+                # Split by "/", translate both parts, and recombine
+                parts = raw_quality.split("/")
+                translated_parts = [quality_translation.get(part.strip(), "Unknown") for part in parts]
+                resort_data["quality"] = "/".join(translated_parts)
+            else:
+                # Translate directly if no "/"
+                resort_data["quality"] = quality_translation.get(raw_quality, "Unknown")
 
             espesor_divs = soup.select(".box_est_partedet_datosnieve .box_est_partedet_dato")
             if len(espesor_divs) >= 2:
                 resort_data["minimum_thickness"] = espesor_divs[0].text.strip().replace("cm", "") or "-"
                 resort_data["maximum_thickness"] = espesor_divs[1].text.strip().replace("cm", "") or "-"
 
-            peligro_div = soup.select_one(".box_est_partedet_aludes .box_est_partedet_aludesno")
-            if peligro_div and peligro_div.text.strip() != "sin información":
-                resort_data["avalanche_risk"] = peligro_div.text.strip()
+            # Select the outer container for "Peligro de Aludes"
+            peligro_div = soup.select_one(".box_est_partedet_aludes")
+
+            if peligro_div:
+                # Locate the specific span that contains the risk number (e.g., 2/5)
+                risk_number = peligro_div.select_one(".box_est_partedet_aludestxt .fuenteazul.fuentegrande b")
+                if risk_number:
+                    resort_data["avalanche_risk"] = f"{risk_number.text.strip()}/5"
 
             kilometros_div = soup.select_one(".box_est_partedet_datosgeneral > div:nth-of-type(3) .dato_circulo")
             if kilometros_div:

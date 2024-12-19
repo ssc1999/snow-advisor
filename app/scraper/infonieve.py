@@ -9,19 +9,19 @@ class InfonieveScraper:
     def scrape_resort_data(self):
         """Scrape the snow report data for a specific resort from Infonieve."""
         resort_data = {
-            "estado": "Closed",
-            "calidad": "-",
-            "espesor_maximo": "-",
-            "espesor_minimo": "-",
-            "peligro_de_aludes": "-",
-            "kilometros": "-",
-            "pistas": {
-                "totales": "-",
-                "verdes": "-",
-                "azules": "-",
-                "rojas": "-",
-                "negras": "-",
-                "itinerarios": "-"
+            "status": "Closed",
+            "quality": "-",
+            "maximum_thickness": "-",
+            "minimum_thickness": "-",
+            "avalanche_risk": "-",
+            "kilometers": "-",
+            "slopes": {
+                "total": "-",
+                "green": "-",
+                "blue": "-",
+                "red": "-",
+                "black": "-",
+                "itineraries": "-"
             }
         }
 
@@ -32,19 +32,19 @@ class InfonieveScraper:
             
             # Scrape each field, with logging for missing data
             estado_div = soup.select_one(".box_est_parteestado_estado")
-            resort_data["estado"] = "Open" if estado_div and estado_div.text.strip() != "CERRADA" else "Closed"
+            resort_data["status"] = "Open" if estado_div and estado_div.text.strip() != "CERRADA" else "Closed"
 
             calidad_div = soup.select_one(".box_est_partedet_nieve")
-            resort_data["calidad"] = calidad_div.text.strip() if calidad_div else "-"
+            resort_data["quality"] = calidad_div.text.strip() if calidad_div else "-"
 
             espesor_divs = soup.select(".box_est_partedet_datosnieve .box_est_partedet_dato")
             if len(espesor_divs) >= 2:
-                resort_data["espesor_minimo"] = espesor_divs[0].text.strip().replace("cm", "") or "-"
-                resort_data["espesor_maximo"] = espesor_divs[1].text.strip().replace("cm", "") or "-"
+                resort_data["minimum_thickness"] = espesor_divs[0].text.strip().replace("cm", "") or "-"
+                resort_data["maximum_thickness"] = espesor_divs[1].text.strip().replace("cm", "") or "-"
 
             peligro_div = soup.select_one(".box_est_partedet_aludes .box_est_partedet_aludesno")
             if peligro_div and peligro_div.text.strip() != "sin información":
-                resort_data["peligro_de_aludes"] = peligro_div.text.strip()
+                resort_data["avalanche_risk"] = peligro_div.text.strip()
 
             kilometros_div = soup.select_one(".box_est_partedet_datosgeneral > div:nth-of-type(3) .dato_circulo")
             if kilometros_div:
@@ -55,7 +55,7 @@ class InfonieveScraper:
                 leyenda_text = leyenda.text.strip().lstrip("/") if leyenda and leyenda.text.strip() else "-"
                 
                 # Combine both parts into the desired format
-                resort_data["kilometros"] = f"{dato_text}/{leyenda_text}"
+                resort_data["kilometers"] = f"{dato_text}/{leyenda_text}"
     
             pistas_div = soup.select(".box_est_partedet_datosgeneral .dato_circulo")
             if len(pistas_div) > 1:
@@ -67,11 +67,11 @@ class InfonieveScraper:
                 leyenda_text = leyenda.text.strip().lstrip("/") if leyenda and leyenda.text.strip() else "-"
                 
                 # Combine into the desired format
-                resort_data["pistas"]["totales"] = f"{dato_text}/{leyenda_text}"
+                resort_data["slopes"]["total"] = f"{dato_text}/{leyenda_text}"
 
             # Extract individual piste types (verdes, azules, etc.)
             trail_breakdown_divs = soup.select(".box_est_partedet_datospistas .dato_circulo")
-            trail_types = ["verdes", "azules", "rojas", "negras", "itinerarios"]
+            trail_types = ["green", "blue", "red", "black", "itineraries"]
             for i, type_ in enumerate(trail_types):
                 try:
                     count = trail_breakdown_divs[i].select_one(".dato_circulo_dato")

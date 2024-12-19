@@ -24,13 +24,13 @@ class DataProcessor:
         processed_data = {
             "resort_name": resort_name,
             "date": date,
-            "estado": infonieve_data.get("estado", "N/A"),
-            "calidad": infonieve_data.get("calidad", "N/A"),
-            "espesor_maximo": infonieve_data.get("espesor_maximo", "N/A"),
-            "espesor_minimo": infonieve_data.get("espesor_minimo", "N/A"),
-            "peligro_de_aludes": infonieve_data.get("peligro_de_aludes", "N/A"),
-            "kilometros": infonieve_data.get("kilometros", "N/A"),
-            "pistas": infonieve_data.get("pistas", {}),
+            "state": infonieve_data.get("state", "N/A"),
+            "quality": infonieve_data.get("quality", "N/A"),
+            "maximum_thickness": infonieve_data.get("maximum_thickness", "N/A"),
+            "minimum_thickness": infonieve_data.get("minimum_thickness", "N/A"),
+            "avalanche_risk": infonieve_data.get("avalanche_risk", "N/A"),
+            "kilometers": infonieve_data.get("kilometers", "N/A"),
+            "slopes": infonieve_data.get("slopes", {}),
             "weather": snow_forecast_data  # Nest the full snow_forecast_data under 'forecast' key
         }
 

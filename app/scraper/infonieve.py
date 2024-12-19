@@ -90,9 +90,9 @@ class InfonieveScraper:
                     count_text = count.text.strip() if count and count.text.strip() else "-"
                     total_text = total.text.strip().lstrip("/") if total and total.text.strip() else "-"
                     
-                    resort_data["pistas"][trail_type_translation[type_]] = f"{count_text}/{total_text}"
+                    resort_data["slopes"][trail_type_translation[type_]] = f"{count_text}/{total_text}"
                 except (IndexError, AttributeError):
-                    resort_data["pistas"][trail_type_translation[type_]] = "-"
+                    resort_data["slopes"][trail_type_translation[type_]] = "-"
                     
         except requests.RequestException as e:
             print(f"Error fetching data for {self.resort_name}: {e}")

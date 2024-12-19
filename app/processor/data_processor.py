@@ -24,7 +24,7 @@ class DataProcessor:
         processed_data = {
             "resort_name": resort_name,
             "date": date,
-            "state": infonieve_data.get("state", "N/A"),
+            "status": infonieve_data.get("status", "N/A"),
             "quality": infonieve_data.get("quality", "N/A"),
             "maximum_thickness": infonieve_data.get("maximum_thickness", "N/A"),
             "minimum_thickness": infonieve_data.get("minimum_thickness", "N/A"),
